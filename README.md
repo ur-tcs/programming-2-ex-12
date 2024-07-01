@@ -2,29 +2,82 @@
 
 ## "We'll get back to that later" is now
 
-In exercise 4, students were instructed to start a project from scratch. This will be the foundation for the first section. We'll start another project, but this time take the time to explain everything in detail.
+In exercise 4, you were instructed to start a project from scratch. this time we'll once again start another project, but now also take the time to explain everything in detail.
 
 ### Starting a simple project from scratch
 
-(this part is copied straight from exercise 4)
+The following section explains every step needed for setting up a basic project. You can either use the Metals extention or the terminal. If you are using different IDEs, the second way will propably also work with the integrated terminals in these.
 
-VSCode and Metals will actually do most of the work for you. A quick glance at https://code.visualstudio.com/api/ux-guidelines/overview can be helpful for navigating the user interface as you follow the instructions below.
+1. Metals extention
+  * Create a new folder for your project and give it a fitting name.
+  * Start VSCode and click on the Metals icon in the Activity Bar.
+  * Among the build commands that are now displayed in the Side Bar, select "New Scala Project".
+  * You will now be offered a bunch of different templates. Choose `scala/scala3.g8`, since `scala/hello-world.g8` will not be in Scala 3! 
+  * Next, select the folder you created in step 1.
+  * Now, you're asked to choose a name for your project. If you don't feel like making decisions today, name it "huffman".
+  * Done! VSCode will ask whether you want to open your project in a new window and whether you want to import the build. Then, you only need to wait a little while your new project is set up for you.
+  * Note: If importing the build using the button in the popup or in the Metals menu takes forever, try importing the build by starting sbt in the terminal.   Using the ```cd <name of project folder>``` command, you can navigate to the right folder and via starting sbt using the ```sbt``` command, the build is automatically imported.
 
-* Create a new folder for your project. If you manage your exercises as recommended in exercise 0, this means creating a folder named `programming-2-ex-12` in the parent folder `ProgrammingII`.
-* Start VSCode and click on the Metals icon in the Activity Bar.
-* Among the build commands that are now displayed in the Side Bar, select "New Scala Project".
-* You will now be offered a bunch of different templates. Choose `scala/scala3.g8`, since `scala/hello-world.g8` will not be in Scala 3! 
-* Next, select the folder you created in step 1.
-* Now, you're asked to choose a name for your project. If you don't feel like making decisions today, name it "huffman".
-* Done! VSCode will ask whether you want to open your project in a new window and whether you want to import the build. Then, you only need to wait a little while your new project is set up for you. 
+2. Terminal
+  * Create a new folder for your project and give it a fitting name.
+  * Start VSCode, open the new folder and show the terminal using the "Toggle-Panel" button on the top right or by pressing ```Ctrl+J```
+  * Run the command ```sbt new scala/scala3.g8```
+  * Now, you're asked to choose a name for your project. If you don't feel like making decisions today, name it "huffman".
+  * Done! You can now see the newly created project folder in the file explorer.
+  * Using the ```cd <name of project folder>``` command, you can now navigate to the right folder and via starting sbt using the ```sbt``` command, the build is automatically imported.
 
-These instructions contain a URL to a webpage explaining the VSCode UI. Maybe we should expand on this and reference more resources that explain how VSCode works, since it was a suggestion in the evaluation. 
+### What did we just create and what purpose does it serve?
+
+After following the steps above, your explorer should display the project folder. The folder should contain the following files: (In case you failed to set up the project, we added the basic project in this GitHub repository)
+
+```.
+├── .bsp
+│   └── sbt.json
+├── project
+│   ├── target
+│   │   ├── config-classes
+│   │   │   └── ...
+│   │   ├── scala-2.12
+│   │   │   └── ...
+│   │   ├── streams
+│   │   │   └── ...
+│   │   └── active.json
+│   └── build.properties
+├── src
+│   ├── main
+│   │   └── main.scala
+│   └── test
+│       └── MySuite.scala
+├── target
+│   ├── global-logging
+│   │   └── ...
+│   └── task-temp-directory
+│   │   └── ...
+├── build.sbt
+└── README.md
+``` 
+
+#### .bsp
+
+#### project
+
+#### src
+
+#### target
+
+#### build.sbt
+
+#### README.md
+
+^Explain all folders/files in detail, What is it for? What can you change?
 
 Now, we should explain **all of the files and the folder structure** of the new project. New files are added after importing the build and compiling, those should be explained as well. Unimportant stuff that is not the focus of the lecture only needs to be explained very briefly, enough that the students understand why they don't need to worry about it (best case: Explain in which semester/module it will be explained). Explanations should be how-do-I-apply-this-to-projects-of-my-own oriented. So, for example, only one sentence on the .bsp folder, while explaining in detail why the main folder exists and what kind of files to put in there.
 
 In my opinion, there is no harm in adding the unaltered `scala/scala3.g8` project files as scaffold code, in case some students struggle to get the project running.
 
-This exercise has to main subjects, Huffman codes and general software engineering practice. We can either keep these topics strictly separated or jump back and forth. I'd suggest the second, since then we can use the Huffman code part as an example for the software engineering principles. In that case, this section would be only "What kind of files exists", and stuff like "What do I put into which file" should be explained later.
+
+
+
 
 ## Theory of Huffman codes
 
