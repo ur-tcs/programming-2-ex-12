@@ -26,9 +26,146 @@ In my opinion, there is no harm in adding the unaltered `scala/scala3.g8` projec
 
 This exercise has to main subjects, Huffman codes and general software engineering practice. We can either keep these topics strictly separated or jump back and forth. I'd suggest the second, since then we can use the Huffman code part as an example for the software engineering principles. In that case, this section would be only "What kind of files exists", and stuff like "What do I put into which file" should be explained later.
 
-## Huffman codes
+## Theory of Huffman codes
 
 I asked around whether students were already familiar with Huffman codes, and they were not. This section should explain the theory in detail, roughly covering "Theory of Huffman Coding" from EPFL. I'd (Franziska) like to do that part if that's ok.
+
+Huffman coding is a lossless (i.e., keeping all information) compression algorithm that can be used to compress lists of symbols. It’s widely used in data compression tasks such as file archiving. For example, huffman coding is used in [Gzip](https://en.wikipedia.org/wiki/Gzip).
+
+### Idea
+
+Imagine you want represent the example string `aaaaabaacdac` in binary, using the symbols `0` and `1`. One of the most common ways to do this is [extended ASCII coding](https://www.ascii-code.com/), which may be the most-used 8 character encoding in the world. In extended ASCII, each symbol is represented by a sequence of 8 bits, meaning that 2^8 = 256 distinct characters and symbols can be represented. 
+
+>[!NOTE]
+> We will talk of a "code" when referring to the sequence of bits that represents a concrete symbol or string of symbols. The entire set of encoding rules will be called a "coding". In other words, we apply the coding to a string to obtain a code.
+
+The ASCII code for the example string `aaaaabaacdac` looks like this:
+
+```
+01100001 01100001 01100001 01100001 
+01100001 01100010 01100001 01100001 
+01100011 01100100 01100001 01100011 
+``` 
+
+In ASCII, every symbol is encoded using 8 bits, so the encoded text has 8 * 12 = 96 bits. That's a lot!
+
+There are several ways to obtain a shorter compression algorithm. Huffman coding utilizes the following principles: 
+
+* Huffman codes are hand-tailored to the text they encode, while ASCII coding is immutable: The ASCII code of `a` will always be `01100001`, while the Huffman code of `a` will be determined based on the text we wish to encode. Technically, Huffman coding is a method of obtaining a coding. 
+* This allows us to use shorter codes: The string we wish to encode only contains 4 distinct symbols. We do not need 8 bits to represent each symbol. In the ASCII example, the bit representations of the letters only differ in the last three digits, so the first 5 bits could be omitted entirely and the encoding would still work.
+* The bit representations of different letters do not need to all be the same length. The letter `a` occurrs a lot more frequently than `b`, `c` or `d`. The compressed text will be shorter if the symbols that often appear in a text are represented by a shorter bit sequence than those being used more rarely. 
+* Since symbols can be encoded using different numbers of bits, we need a way to avoid ambiguity. For example, if the letter `a` were encoded `0` and the letter `b` were encoded `00`, then the code `00` could represent both `aa` and `b`. In Huffman coding, this is ensured by the *prefix property*: No Huffman code of a symbol can be the prefix of the Huffman code of another symbol. This also allows us to decode a string from left-to-right without backtracking.
+
+A Huffman encoding of `aaaaabaacdac` could look like this: 
+
+| Symbol | Frequency | Huffman Code |
+| -------|-----------|--------------|
+| a | 8 | 0|
+| b | 1 | 110 |
+| c | 2 | 10 |
+| d | 1 | 111 |
+
+For `aaaaabaacdac`, we obtain the code ` 0 0 0 0 0 110 0 0 10 111 0 10 `. Instead of 96 bits, we only need 18!
+
+We will now see how to obtain a Huffman encoding for a given text.
+
+### Constructing Huffman Code Trees
+
+Huffman codings are represented by a code tree, which is a binary tree with leaves representing the symbols. The tree is constructed using the following steps: 
+
+1. Count the number of appearances of each symbol in the text.
+2. Create a forest of unconnected leaf nodes. Each leaf represents a symbol and is associated with a weight representing the frequency of appearances of that symbol. In the `aaaaabaacdac` example, this forest looks like this: 
+```
+a(8)   b(1)   c(2)   d(1) 
+```
+
+3. While there’s more than one code tree, merge the two trees with the lowest root weight into a new tree by creating a new branching node. A branching node can be thought of as a set containing the symbols present in the leaves below it, with its weight being the total weight of those leaves. 
+
+```
+               {b,d}(2)
+                /    \
+a(8)   c(2)   b(1)   d(1)
+```
+
+```
+    {b,c,d}(4)
+     /      \
+   c(2)   {b,d}(2)
+           /     \
+a(8)     b(1)   d(1) 
+```
+
+```
+ {a,b,c,d}(12)
+   /       \
+a(8)   {b,c,d}(4)
+        /      \
+      c(2)   {b,d}(2)
+              /     \
+            b(1)   d(1) 
+```
+
+### Encoding 
+
+For a given Huffman tree, one can obtain the code of a symbol by traversing from the root of the tree to the leaf containing the symbol. Along the way, when a left branch is chosen, a `0` is added to the code, and when a right branch is chosen, `1` is added to the code.
+
+Check yourself: What is the Huffman code for the symbol `d` in the below tree? 
+
+```
+{a,b,c,d,e,f,g,h}(17)
+  /             \
+a(8)        {b,c,d,e,f,g,h}(9)
+           /                 \
+      {bcd}(5)              {efgh}(4)
+         /    \              /    \
+      b(3)   {c,d}(2)   {e,f}(2)   {g,h}(2) 
+            /   \        /   \       /   \   
+          c(1) d(1)    e(1) f(1)   g(1) h(1)
+```
+
+<details>
+<summary> Solution </summary> 
+
+`1011`
+
+</details><br/>
+
+Practice Huffman coding together with a friend: Have each of you write down a string of letters. Then, take your friend's string and construct a corresponding Huffman tree! More distinct letters mean more work, so try to aim for 6 to 10 distinct letters.
+
+### Decoding 
+
+Decoding also starts at the root of the tree. Given a sequence of bits to decode, we successively read the bits, and for each 0, we choose the left branch, and for each 1 we choose the right branch.
+
+When we reach a leaf, we decode the corresponding symbol and then start again at the root of the tree.
+
+Check yourself: Given the Huffman code tree of the last check, what does the sequence of bits `10001010` correpond to?
+
+<details>
+<summary> Solution </summary> 
+
+`bac`
+
+</details><br/>
+
+If you practiced Huffman coding with a friend or a group of friends, each of you should have constructed a Huffman tree. Now, take the tree your friend made and encode a message!
+
+### Suitable Types of Symbols
+
+Huffman coding can handle different types of symbols. The previous examples shows that a symbol can be a letter.
+
+#### Image Compression
+
+We can compress an image where each symbol is a color represented as a RGB tuple (Red, Green, Blue). Each symbol can be something like (255, 0, 0) for pure red, (0, 255, 0) for pure green, etc.
+
+#### DNA Sequences
+
+DNA sequences are composed of four primary nucleotides: Adenine (A), Cytosine (C), Guanine (G), and Thymine (T). Besides A, C, G, T, common codons like ATG or TAA can also be treated as individual symbols to make the compression more efficient.
+
+#### Binary Data
+
+For files that aren’t text-based, such as executables, Huffman coding can operate on bytes (sequences of 8 bits) or even larger chunks of bits.
+
+In general, any data that can be broken down into discrete, countable units can be compressed using Huffman coding. This includes things mentioned in above examples or sensor readings, log entries, and more.
 
 ## Implementation
 
@@ -38,7 +175,16 @@ This section should roughly follow the "Implementation Guide" section from EPFL,
 
 * What functions do I need and why? (can maybe be moved to the Huffman Codes section)
 * What do I put into which file?
-* Maybe try to divide into sections that each can stand on its own, so students don't have to finish everything to see their code in action?
+* Maybe try to divide into sections that each can stand on its own, so students don't have to finish everything to see their code in action?As already mentioned, you will implement this project mostly from scratch. Don't worry, we will help you!
+
+Take a moment to think about all the features that could be implemented, and the supporting functions, objects and data structures you need.
+
+Done? Here's what we'll do together this week. Of course, you can always add more!
+
+* Implementation of Huffman trees
+* Write a function that constructs a Huffman tree based on an input text
+* Decoding
+* Encoding
 
 ## Finalizing the project 
 
