@@ -31,8 +31,6 @@ The following section explains every step needed for setting up a basic project.
 After following the steps above, your explorer should display the project folder. The folder should contain the following files: (In case you failed to set up the project, we added the basic project in this GitHub repository)
 
 ```.
-├── .bsp
-│   └── sbt.json
 ├── project
 │   ├── target
 │   │   ├── config-classes
@@ -57,17 +55,62 @@ After following the steps above, your explorer should display the project folder
 └── README.md
 ``` 
 
-#### .bsp
-
 #### project
+
+(plugins and additional settings for sbt)
 
 #### src
 
+In this folder, all code you are writing is stored. It contains the main folder and the test folder.
+
+  1. /main
+    
+    This folder contains all files with the actual code of your project. At the start, there is only the ```Main.scala``` file. The file named "Main" is usually the starting point when you run your code. As you might have noticed from earlier exercises, the amount of ```.scala``` files in this folder can increase quite rapidly, so if needed sort your files in fittingly named folders for better oversight. 
+
+  2. /test
+    
+    This folder contains all files with automated tests for your project. At the start, it only contains a short test that always succeeds. You have propably seen and used such tests in earlier exercises. Later in this exercise you will learn to write these tests yourself (if you havent written some yourself already). You do not need to write all tests into one file, you can spread them over multiple separate files.
+
 #### target
+
+(generated files)
 
 #### build.sbt
 
+```scala
+val scala3Version = "3.4.2"
+```
+
+As part of your build definition you specify the version of sbt that your build uses. This allows people with different versions of the sbt launcher to build the same projects with consistent results.
+
+```scala
+lazy val root = project
+  .in(file("."))
+  .settings(
+    name := "huffman",
+    version := "0.1.0-SNAPSHOT",
+
+    scalaVersion := scala3Version,
+
+    libraryDependencies += "org.scalameta" %% "munit" % "1.0.0" % Test
+  )
+```
+
+In the second part, there are various other settings for your project, including the name of the project folder, the build version or any library dependencies. For a detailed explaination, read the [sbt documentation](https://www.scala-sbt.org/1.x/docs/Basic-Def.html)
+
 #### README.md
+
+A README is a Markdown file that usually encapsulates important information about the provided code. README files typically include information on:
+
+- What the project does
+- Why the project is useful
+- How users can get started with the project
+- Where users can get help with your project
+- Who maintains and contributes to the project
+
+When taking a look at the README file you generated in the beginning, you can read about all these topics.
+
+If you have any important information about your code which should not be part of the code itself as a comment, do not hesitate to write everything into the README file. Using the Markdown format, you have various very easy options to modify, structure or format your text. A quick oversight over all functions of Markdown offers the [cheatsheet](https://www.markdownguide.org/cheat-sheet/). If you need a previw of how your README will look, klick the "Open Preview to the Side" button (book with magnifying glasses) on the top right.
 
 ^Explain all folders/files in detail, What is it for? What can you change?
 
@@ -75,9 +118,9 @@ Now, we should explain **all of the files and the folder structure** of the new 
 
 In my opinion, there is no harm in adding the unaltered `scala/scala3.g8` project files as scaffold code, in case some students struggle to get the project running.
 
+### Running your project
 
-
-
+(how do you run the project?, summarization of all possible commands)
 
 ## Theory of Huffman codes
 
