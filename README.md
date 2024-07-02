@@ -33,13 +33,7 @@ After following the steps above, your explorer should display the project folder
 ```.
 ├── project
 │   ├── target
-│   │   ├── config-classes
-│   │   │   └── ...
-│   │   ├── scala-2.12
-│   │   │   └── ...
-│   │   ├── streams
-│   │   │   └── ...
-│   │   └── active.json
+│   │   └── ...
 │   └── build.properties
 ├── src
 │   ├── main
@@ -50,14 +44,10 @@ After following the steps above, your explorer should display the project folder
 │   ├── global-logging
 │   │   └── ...
 │   └── task-temp-directory
-│   │   └── ...
+│       └── ...
 ├── build.sbt
 └── README.md
 ``` 
-
-#### project
-
-(plugins and additional settings for sbt)
 
 #### src
 
@@ -65,15 +55,15 @@ In this folder, all code you are writing is stored. It contains the main folder 
 
   1. /main
     
-    This folder contains all files with the actual code of your project. At the start, there is only the ```Main.scala``` file. The file named "Main" is usually the starting point when you run your code. As you might have noticed from earlier exercises, the amount of ```.scala``` files in this folder can increase quite rapidly, so if needed sort your files in fittingly named folders for better oversight. 
+  This folder contains all files with the actual code of your project. At the start, there is only the ```Main.scala``` file. The file named "Main" is usually the starting point when you run your code. As you might have noticed from earlier exercises, the amount of ```.scala``` files in this folder can increase quite rapidly, so if needed sort your files in fittingly named folders for better oversight. 
 
   2. /test
     
-    This folder contains all files with automated tests for your project. At the start, it only contains a short test that always succeeds. You have propably seen and used such tests in earlier exercises. Later in this exercise you will learn to write these tests yourself (if you havent written some yourself already). You do not need to write all tests into one file, you can spread them over multiple separate files.
+  This folder contains all files with automated tests for your project. At the start, it only contains a short test that always succeeds. You have propably seen and used such tests in earlier exercises. Later in this exercise you will learn to write these tests yourself (if you havent written some yourself already). You do not need to write all tests into one file, you can spread them over multiple separate files.
 
 #### target
 
-(generated files)
+Generated files (compiled classes, packaged jars, managed files, caches, and documentation) will be written to the target directory by default. You can take a look at all included files, but you will propably not need to change any of these files right now.
 
 #### build.sbt
 
@@ -98,6 +88,14 @@ lazy val root = project
 
 In the second part, there are various other settings for your project, including the name of the project folder, the build version or any library dependencies. For a detailed explaination, read the [sbt documentation](https://www.scala-sbt.org/1.x/docs/Basic-Def.html)
 
+#### project
+
+build.sbt conceals how sbt really works. sbt builds are defined with Scala code. That code, itself, has to be built. What better way than with sbt?
+
+The project directory is another build inside your build, which knows how to build your build. Your build definition is an sbt project.
+
+This topic is rather complex but you can read about what it is and how to use it in the [sbt doumentation](https://www.scala-sbt.org/1.x/docs/Organizing-Build.html)
+
 #### README.md
 
 A README is a Markdown file that usually encapsulates important information about the provided code. README files typically include information on:
@@ -120,7 +118,23 @@ In my opinion, there is no harm in adding the unaltered `scala/scala3.g8` projec
 
 ### Running your project
 
-(how do you run the project?, summarization of all possible commands)
+You read about what these files are, now lets quickly rehearse all important steps for running your program.
+
+#### Starting sbt
+
+Before being able to run your code, you must start the sbt in the right folder as mentioned before.
+
+Using the ```cd <path to project folder>``` command, navigate to the right folder. Then you start sbt using the ```sbt``` command. If you encounter a warning message telling you about missing directories, check if you started sbt from the right folder.
+If you want to stop sbt because you want to restart or for other reasons, simply run ```exit```.
+
+To compile your code, simply type ```compile``` and for runnign your code type ```run```.
+To run all available tests, run ```test```. 
+
+Be aware that running ```run``` or ```test``` will automatically compile the code and you do not need to make this step manually.
+
+In case you want to test only a specific function of your code, simply type ```testOnly -- "*<name of function>*"```
+
+For further run commands check out the [sbt documentation](https://www.scala-sbt.org/1.x/docs/Running.html) and for further test commands also check out the [sbt documentation](https://www.scala-sbt.org/1.x/docs/Testing.html)
 
 ## Theory of Huffman codes
 
