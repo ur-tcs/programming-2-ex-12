@@ -59,7 +59,7 @@ In this folder, all code you are writing is stored. It contains the main folder 
 
   2. /test
     
-  This folder contains all files with automated tests for your project. At the start, it only contains a short test that always succeeds. You have propably seen and used such tests in earlier exercises. Later in this exercise you will learn to write these tests yourself (if you havent written some yourself already). You do not need to write all tests into one file, you can spread them over multiple separate files.
+  This folder contains all files with automated tests for your project. At the start, it only contains a short test that always succeeds. You have propably seen and used such tests in earlier exercises. Later in this exercise you will learn to write these tests yourself (if you haven't written some yourself already). You do not need to write all tests into one file, you can spread them over multiple separate files.
 
 #### target
 
