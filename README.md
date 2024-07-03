@@ -255,7 +255,7 @@ If you practiced Huffman coding with a friend or a group of friends, each of you
 
 ### Suitable Types of Symbols
 
-Huffman coding can handle different types of symbols. The previous examples shows that a symbol can be a letter.
+Huffman coding can handle different types of symbols. The previous examples show that a symbol can be a letter. Here are a few more examples in which Huffman coding can be applied. Don't worry, this week's exercise will only deal with "normal" characters.
 
 #### Image Compression
 
@@ -273,22 +273,100 @@ In general, any data that can be broken down into discrete, countable units can 
 
 ## Implementation
 
+This week, you will implement your project mostly from scratch. In the first section of this exercise, you have created a new project that already came with some basic infrastructure, such as a build.sbt file and a reasonable folder structure. We will now build on this.
+
+At first, we will only focus on the theory of Huffman coding that you have just been introduced to: 
+
+* Implementation of Huffman trees
+* Write a function that constructs a Huffman tree based on an input text
+* Decoding
+* Encoding
+
+You can always add more later. 
+
+### Implementation of Huffman trees
+
+Come up with an `abstract class` `CodeTree[T]` that represents Huffman trees in Scala. Remember:
+
+* Huffman trees are binary.
+* Each node, both leaf nodes and inner nodes, has a weight.
+* Each leaf is associated with a symbol, while branching nodes are associated with sets or lists of symbols.
+* We use a type parameter `[T]` so our definition is not limited to one type.
+
+You also need to decide *where* to put the definition. Of course you could put everything into the `main.scala` file, or you could create one or more separate folders to structure your work. We leave this to you. 
+
+<details>
+<summary> Solution </summary> 
+
+```Scala
+abstract class CodeTree[T]
+case class Leaf[T](symbol: T, weight: Int) extends CodeTree[T]
+case class Fork[T](left: CodeTree[T], right: CodeTree[T], symbols: List[T], weight: Int) extends CodeTree[T]
+```
+
+</details><br/>
+
+Time to define some useful functions! First, you are going to define the functions `weight`, which returns the weight of a Huffman tree's root node, and `symbols`, which returns a list of the symbols defined in a given Huffman tree.
+
+```Scala
+def weight(tree: CodeTree[T]): Int =
+  ???
+
+def symbols(tree: CodeTree[T]): List[T] =
+  ???
+```
+
+Again, you decide where to put these functions. 
+
+Using `weight` and `symbols`, you can define the function `makeCodeTree` which takes the left and right subtrees, then builds a new tree by adding a parent node on top of these two trees:
+
+```Scala
+def makeCodeTree(left: CodeTree[T], right: CodeTree[T]): CodeTree[T] =
+  ???
+```
+
+<details>
+<summary> Solution </summary> 
+
+```Scala
+def makeCodeTree(left: CodeTree[T], right: CodeTree[T]): CodeTree[T] =
+  Fork(left, right, symbols(left) ++ symbols(right), weight(left) + weight(right))
+```
+
+</details><br/>
+
+`makeCodeTree` automatically calculates the list of symbols and the weight when creating a node. Therefore, code trees can be constructed manually in the following way:
+
+```Scala
+val sampleTree = makeCodeTree(
+  makeCodeTree(Leaf('x', 1), Leaf('e', 1)),
+  Leaf('t', 2)
+)
+```
+
+### Constructing Huffman code trees
+
+Hey, didn't we just define a function that constructs trees? Why the caption?
+
+Because `makeCodeTree` still requires you to build the tree manually. We want to create a function that takes an input text and automatically identifies the symbols, calculates the weights, creates a forest of leaf nodes and then iteratively builds a connected tree. The finished function should
+
+Obviously, you'll need a lot of supporting functions. Take a moment about which parts of the process should be isolated and turned into its own function.
+
+
+<details>
+<summary> Our suggestion </summary> 
+
+* 
+
+</details><br/>
+
 Julie found the source files including solutions outside of gitlab here: https://github.com/userdarius/software-construction-epfl/tree/main/labs/huffman-coding. 
 
 This section should roughly follow the "Implementation Guide" section from EPFL, although our approach needs to be different since the students won't be working with a skeleton. We have to add explanations for the following:
 
 * What functions do I need and why? (can maybe be moved to the Huffman Codes section)
 * What do I put into which file?
-* Maybe try to divide into sections that each can stand on its own, so students don't have to finish everything to see their code in action?As already mentioned, you will implement this project mostly from scratch. Don't worry, we will help you!
-
-Take a moment to think about all the features that could be implemented, and the supporting functions, objects and data structures you need.
-
-Done? Here's what we'll do together this week. Of course, you can always add more!
-
-* Implementation of Huffman trees
-* Write a function that constructs a Huffman tree based on an input text
-* Decoding
-* Encoding
+* Maybe try to divide into sections that each can stand on its own, so students don't have to finish everything to see their code in action?
 
 ## Finalizing the project 
 
