@@ -112,13 +112,9 @@ If you have any important information about your code which should not be part o
 
 ^Explain all folders/files in detail, What is it for? What can you change?
 
-Now, we should explain **all of the files and the folder structure** of the new project. New files are added after importing the build and compiling, those should be explained as well. Unimportant stuff that is not the focus of the lecture only needs to be explained very briefly, enough that the students understand why they don't need to worry about it (best case: Explain in which semester/module it will be explained). Explanations should be how-do-I-apply-this-to-projects-of-my-own oriented. So, for example, only one sentence on the .bsp folder, while explaining in detail why the main folder exists and what kind of files to put in there.
-
-In my opinion, there is no harm in adding the unaltered `scala/scala3.g8` project files as scaffold code, in case some students struggle to get the project running.
-
 ### Running your project
 
-You read about what these files are, now lets quickly rehearse all important steps for running your program.
+You read about what these files are, now let's quickly rehearse all important steps for running your program.
 
 #### Starting sbt
 
@@ -127,10 +123,10 @@ Before being able to run your code, you must start the sbt in the right folder a
 Using the ```cd <path to project folder>``` command, navigate to the right folder. Then you start sbt using the ```sbt``` command. If you encounter a warning message telling you about missing directories, check if you started sbt from the right folder.
 If you want to stop sbt because you want to restart or for other reasons, simply run ```exit```.
 
-To compile your code, simply type ```compile``` and for runnign your code type ```run```.
+To compile your code, simply type ```compile``` and for running your code type ```run```.
 To run all available tests, run ```test```. 
 
-Be aware that running ```run``` or ```test``` will automatically compile the code and you do not need to make this step manually.
+Be aware that running ```run``` or ```test``` will automatically compile the code and you do not need to take this step manually.
 
 In case you want to test only a specific function of your code, simply type ```testOnly -- "*<name of function>*"```
 
@@ -138,9 +134,7 @@ For further run commands check out the [sbt documentation](https://www.scala-sbt
 
 ## Theory of Huffman codes
 
-I asked around whether students were already familiar with Huffman codes, and they were not. This section should explain the theory in detail, roughly covering "Theory of Huffman Coding" from EPFL. I'd (Franziska) like to do that part if that's ok.
-
-Huffman coding is a lossless (i.e., keeping all information) compression algorithm that can be used to compress lists of symbols. It’s widely used in data compression tasks such as file archiving. For example, huffman coding is used in [Gzip](https://en.wikipedia.org/wiki/Gzip).
+Tody's exercise is about Huffman coding. Huffman coding is a lossless (i.e., keeping all information) compression algorithm that can be used to compress lists of symbols. It’s widely used in data compression tasks such as file archiving. For example, huffman coding is used in [Gzip](https://en.wikipedia.org/wiki/Gzip).
 
 ### Idea
 
