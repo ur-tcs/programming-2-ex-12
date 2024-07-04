@@ -110,8 +110,6 @@ When taking a look at the README file you generated in the beginning, you can re
 
 If you have any important information about your code which should not be part of the code itself as a comment, do not hesitate to write everything into the README file. Using the Markdown format, you have various very easy options to modify, structure or format your text. A quick oversight over all functions of Markdown offers the [cheatsheet](https://www.markdownguide.org/cheat-sheet/). If you need a previw of how your README will look, klick the "Open Preview to the Side" button (book with magnifying glasses) on the top right.
 
-^Explain all folders/files in detail, What is it for? What can you change?
-
 ### Running your project
 
 You read about what these files are, now let's quickly rehearse all important steps for running your program.
@@ -288,7 +286,7 @@ You can always add more later.
 
 Come up with an `abstract class` `CodeTree[T]` that represents Huffman trees in Scala. Remember:
 
-* Huffman trees are binary.
+* Huffman trees are binary, meaning each node has at most two children.
 * Each node, both leaf nodes and inner nodes, has a weight.
 * Each leaf is associated with a symbol, while branching nodes are associated with sets or lists of symbols.
 * We use a type parameter `[T]` so our definition is not limited to one type.
