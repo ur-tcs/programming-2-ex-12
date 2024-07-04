@@ -346,17 +346,82 @@ val sampleTree = makeCodeTree(
 
 Hey, didn't we just define a function that constructs trees? Why the caption?
 
-Because `makeCodeTree` still requires you to build the tree manually. We want to create a function that takes an input text and automatically identifies the symbols, calculates the weights, creates a forest of leaf nodes and then iteratively builds a connected tree. The finished function should
+Because `makeCodeTree` still requires you to build the tree manually. We want to create a function `createCodeTree` that takes an input text (in the form of a list) and automatically identifies the symbols, calculates the weights, creates a forest of leaf nodes and then iteratively builds a connected tree.
 
-Obviously, you'll need a lot of supporting functions. Take a moment about which parts of the process should be isolated and turned into its own function.
+That is a lot of steps, so you'll need a lot of supporting functions. Take a moment about which parts of the process should be isolated and turned into separate functions. What do the functions take as input and what should the output look like? 
 
+When you are finished thinking about this, you can continue. We will walk through one possible solution step by step, but of course you are free to come up an approach of your own.
 
-<details>
-<summary> Our suggestion </summary> 
+1. Define a function `symbolFreqs` which calculates the frequency of each symbol in the text.
 
-* 
+```Scala
+def symbolFreqs(symbols: List[T]): List[(T, Int)] =
+  ???
+```
 
-</details><br/>
+2. Write a function `makeOrderedLeafList` which generates a list containing all the leaves of the Huffman code tree to be constructed (the case `Leaf[T]` of the algebraic datatype `CodeTree[T]`). The list should be ordered by ascending weights where the weight of a leaf is the number of times (i.e., the frequency) it appears in the given text.
+
+```Scala
+def makeOrderedLeafList(freqs: List[(T, Int)]): List[Leaf[T]] =
+  ???
+```
+
+3. Write a simple function `isSingleton` which checks whether a list of code trees contains only one single tree.
+
+```Scala
+def isSingleton(trees: List[CodeTree[T]]): Boolean =
+  ???
+```
+
+4. Write a function `combine` which
+   1. removes the two trees with the lowest weight from the list constructed in the previous step, and
+   2. merges them by creating a new node of type `Fork[T]`. Add this new tree to the list - which is now one element shorter - while preserving the order (by weight).
+
+```Scala
+def combine(trees: List[CodeTree[T]]): List[CodeTree[T]] =
+  ???
+```
+
+5. Write a function `until` which calls the `isSingleton` and `combine` until this list contains only a single tree. This tree is the final coding tree. The function `until` can be used in the following way:
+
+```Scala
+until(isSingleton, combine)(trees)
+```
+
+where `isSingleton` and `combine` refer to the two functions defined above.
+
+```Scala
+def until(
+    isDone: List[CodeTree[T]] => Boolean,
+    merge: List[CodeTree[T]] => List[CodeTree[T]]
+)(trees: List[CodeTree[T]]): List[CodeTree[T]] =
+  ???
+```
+
+6. Finally, use the functions defined above to implement the function `createCodeTree`.
+
+```Scala
+def createCodeTree(symbols: List[T]): CodeTree[T] =
+  ???
+```
+
+### Decoding
+
+Now, it is time to write functions for decoding. We will again split up the process. In this lab, type `Bit` is an alias of `Int`.
+
+First, define a function `decodeOne` which decodes one symbol from the bit sequence using the given code tree. The function returns an option. If succeed, it returns `Some(sym, remainingBits)`, where `sym` is the decoded symbol and `remainingBits` is the rest of the bit sequence that remains unused. Otherwise, return `None` if it fails to decode.
+
+```Scala
+def decodeOne(tree: CodeTree[T], bits: List[Bit]): Option[(T, List[Bit])] =
+  ???
+```
+
+Using `decodeOne`, now we can define the function `decode` which decodes a list of bits (which were already encoded using a Huffman code tree), given the corresponding code tree.
+
+```Scala
+def decode(tree: CodeTree[T], bits: List[Bit]): List[T] =
+  ???
+``` 
 
 Julie found the source files including solutions outside of gitlab here: https://github.com/userdarius/software-construction-epfl/tree/main/labs/huffman-coding. 
 
