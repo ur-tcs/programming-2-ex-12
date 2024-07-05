@@ -603,5 +603,8 @@ def mergeCodeTables(a: CodeTable, b: CodeTable): CodeTable =
 
 Now we can implement `quickEncode` using `convert`.
 
+## Burrows-Wheeler transform 🔥
 
+The [Burrows-Wheeler transform](https://en.wikipedia.org/wiki/Burrows%E2%80%93Wheeler_transform) is a supportive method for text compression. 
 
+Your task is simple: Implement the BWT, either by adding it to your Huffman project or by creating a new project the way you were shown. There is plenty of documentation online. You are on your own now, have fun!
