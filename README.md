@@ -607,4 +607,4 @@ Now we can implement `quickEncode` using `convert`.
 
 The [Burrows-Wheeler transform](https://en.wikipedia.org/wiki/Burrows%E2%80%93Wheeler_transform) is a supportive method for text compression. 
 
-Your task is simple: Implement the BWT, either by adding it to your Huffman project or by creating a new project the way you were shown. There is plenty of documentation online. You are on your own now, have fun!
+Your task is simple: Implement the BWT, either by adding it to your Huffman project or by creating a new project the way you were shown. There is plenty of documentation online (researching things on your own is an important skill for every programmer, so we intentionally don't give you any more guidance than this). You are on your own now, have fun!
