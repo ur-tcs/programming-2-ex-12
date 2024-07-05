@@ -1,5 +1,11 @@
 # Programming 2 - Exercise 12: Huffman Codes and Structuring Software Projects
 
+This week's exercise will revisit some concepts that were introduced early in the course, or teased and then not followed up upon. You will also implement Huffman codes.
+
+The most important parts of the exercise are marked with ⭐️. Exercises that are particularly challenging are marked with 🔥.
+
+**You are allowed to copy/clone/fork this repository, but not to share solutions of the exercise in any public repository or web page.**
+
 ## Starting a simple project from scratch
 
 The following section explains every step needed for setting up a basic project. You can either use the Metals extention or the terminal. If you are using different IDEs, the second way will propably also work with the integrated terminals in these.
@@ -207,7 +213,7 @@ a(8)   {b,c,d}(4)
 
 For a given Huffman tree, one can obtain the code of a symbol by traversing from the root of the tree to the leaf containing the symbol. Along the way, when a left branch is chosen, a `0` is added to the code, and when a right branch is chosen, `1` is added to the code.
 
-Check yourself: What is the Huffman code for the symbol `d` in the below tree? 
+⭐️ Check yourself: What is the Huffman code for the symbol `d` in the below tree? 
 
 ```
 {a,b,c,d,e,f,g,h}(17)
@@ -236,7 +242,7 @@ Decoding also starts at the root of the tree. Given a sequence of bits to decode
 
 When we reach a leaf, we decode the corresponding symbol and then start again at the root of the tree.
 
-Check yourself: Given the Huffman code tree of the last check, what does the sequence of bits `10001010` correpond to?
+⭐️ Check yourself: Given the Huffman code tree of the last check, what does the sequence of bits `10001010` correpond to?
 
 <details>
 <summary> Solution </summary> 
@@ -278,7 +284,7 @@ At first, we will only focus on the theory of Huffman coding that you have just 
 
 You can always add more later. 
 
-### Implementation of Huffman trees
+### Implementation of Huffman trees ⭐️
 
 Come up with an `abstract class` `CodeTree[T]` that represents Huffman trees in Scala. Remember:
 
@@ -374,7 +380,7 @@ val sampleTree = makeCodeTree(
 
 Which brings us to...
 
-### Testing
+### Testing ⭐️
 
 If you created your project following our instructions, a folder and file `MySuite.scala` have been automatically generated. The contents of `MySuite.scala` should look like this:
 
@@ -392,18 +398,70 @@ class MySuite extends munit.FunSuite {
 
 MUnit is a Scala testing library that is already included in your `build.sbt` file.
 
-You will now add tests on your own! We will start with `weight`.
+You will now add tests on your own! We will start with `weight`. You can write the tests into the existing file `MySuite.scala`, or create a new file in the same folder. Have a look at the following code:
+
+```Scala
+package huffman
+
+class HuffmanCharTest extends munit.FunSuite:
+
+  import HuffmanChar.*
+
+  test("weight: weight of a simple leaf"):
+    assertEquals(weight(Leaf('c', 29)), 29)
+```
+<div style="text-align: right; color:grey"> 
+
+[huffman/src/test/scala/simpleTest.scala](./huffman/src/test/scala/simpleTest.scala)
+</div>
+
+You can copy this code fragment or download the respective file from this repository. Then, you can run the test by simply typing `test` in sbt or, if you only want to test the `weight` function and not the old `MySuite` test, use the command `testOnly -- "*weight*"`.
+
+The test itself is fairly simple: In `test()`, you write the description of the test. The `testOnly` command will look for keywords within this string, not within the "body" of the test. So make sure to include a meaningful description!
+
+The following line assures that the weight of `Leaf('c', 29)`, a Huffman tree that only consists of one leaf node with weight 29, is correctly calculated.
+
+Task: Construct a larger Huffman tree to use in the following tests. Then, use that tree to write more elaborate tests for `weight` and `symbols`.
+
+<details>
+<summary> Hint </summary> 
+
+Create an object `TestTrees` that contains the tree, and to which you can add more useful test subjects (for example, texts to decode) later. Your file could start like this:
+
+```Scala
+package huffman
+
+class HuffmanCharTest extends munit.FunSuite:
+
+  import HuffmanChar.*
+  object TestTrees:
+    val t2 = Fork(Fork(Leaf('a',2), Leaf('b',3), List('a','b'), 5), Leaf('d',4), List('a','b','d'), 9)
+    // put more members here when needed later
 
 
+  import TestTrees.*
 
+  test("weight: weight of a simple leaf"):
+    assertEquals(weight(Leaf('c', 29)), 29)
 
-### Constructing Huffman code trees
+  test("weight: weight of a larger tree"):
+    ???
+```
+
+</details><br/>
+
+In the following tasks, we will not dictate which tests you have to implement. Instead, you'll have to come up with meaningful tests on your own. Two approaches that are usually a good idea:
+
+* Test whether the function handles "minimal" input correctly, such as empty lists.
+* Test if the function works correctly on an example that you calculated manually.
+
+### Constructing Huffman code trees ⭐️
 
 Hey, didn't we just define a function that constructs trees? Why the caption?
 
 Because `makeCodeTree` still requires you to build the tree manually. We want to create a function `createCodeTree` that takes an input text (in the form of a list) and automatically identifies the symbols, calculates the weights, creates a forest of leaf nodes and then iteratively builds a connected tree.
 
-That is a lot of steps, so you'll need a lot of supporting functions. Take a moment about which parts of the process should be isolated and turned into separate functions. What do the functions take as input and what should the output look like? 
+That is a lot of steps, so you'll need a lot of supporting functions. Take a moment about which parts of the process should be isolated and turned into separate functions. What do the functions take as input and what should the output look like? Based on our existing class hierarchy, where do you put the functions?
 
 When you are finished thinking about this, you can continue. We will walk through one possible solution step by step, but of course you are free to come up an approach of your own.
 
@@ -460,42 +518,90 @@ def createCodeTree(symbols: List[T]): CodeTree[T] =
   ???
 ```
 
-### Decoding
+7. Write tests for all of your functions!
 
-Now, it is time to write functions for decoding. We will again split up the process. In this lab, type `Bit` is an alias of `Int`.
+### Decoding ⭐️
 
-First, define a function `decodeOne` which decodes one symbol from the bit sequence using the given code tree. The function returns an option. If succeed, it returns `Some(sym, remainingBits)`, where `sym` is the decoded symbol and `remainingBits` is the rest of the bit sequence that remains unused. Otherwise, return `None` if it fails to decode.
+Now, it is time to write functions for decoding. We will again split up the process. The encoded messages will be represented by lists of integers. For example, the sequence `10001010` will be represented by `list(1,0,0,0,1,0,1,0)`.
+
+First, define a function `decodeOne` which decodes one symbol from a bit sequence using the given code tree. The function returns an option. If succeeding, it returns `Some(sym, remainingBits)`, where `sym` is the decoded symbol and `remainingBits` is the rest of the bit sequence that remains unused. Otherwise, return `None` if it fails to decode.
 
 ```Scala
-def decodeOne(tree: CodeTree[T], bits: List[Bit]): Option[(T, List[Bit])] =
+def decodeOne(tree: CodeTree[T], bits: List[Int]): Option[(T, List[Int])] =
   ???
 ```
 
 Using `decodeOne`, now we can define the function `decode` which decodes a list of bits (which were already encoded using a Huffman code tree), given the corresponding code tree.
 
 ```Scala
-def decode(tree: CodeTree[T], bits: List[Bit]): List[T] =
+def decode(tree: CodeTree[T], bits: List[Int]): List[T] =
   ???
 ``` 
 
-Julie found the source files including solutions outside of gitlab here: https://github.com/userdarius/software-construction-epfl/tree/main/labs/huffman-coding. 
+### Encoding
 
-This section should roughly follow the "Implementation Guide" section from EPFL, although our approach needs to be different since the students won't be working with a skeleton. We have to add explanations for the following:
+This section deals with the Huffman encoding of a sequence of symbols into a sequence of bits.
 
-* What functions do I need and why? (can maybe be moved to the Huffman Codes section)
-* What do I put into which file?
-* Maybe try to divide into sections that each can stand on its own, so students don't have to finish everything to see their code in action?
+#### …Using a Huffman Tree ⭐️
 
-## Finalizing the project 
+Define the function `encode` which encodes a list of characters using Huffman coding, given a code tree.
 
-More stuff: 
+```Scala
+def encode(tree: CodeTree[T])(text: List[T]): List[Int] =
+  ???
+```
 
-* The EPFL scaffold code contains a lot of supplementary functions that tie everything together and are not explained in the exercise. Having the students write everything themselves would be too much work for one week. We could either supply those functions for them to copy and paste, or try to rewrite the exercise such that we don't need them. Best might be a combination of both: Supply the functions that allow students to process larger files, but omit the fancy user interface.
-* EPFL uses a custom .huf format for encoded files. Maybe scrap and replace this (I tried to open a .huf file in notepad++ and it did NOT look pretty)
-* building on exercise 11: Testing, pre- and postconditions.
+Your implementation must traverse the coding tree for each symbol, which is a task that should be done using a helper function.
 
+<details>
+<summary> Hint </summary> 
 
+`flatMap` may be useful here! 
 
+</details><br/>
+
+#### …Using a Coding Table 🔥
+
+The previous function is simple, but very inefficient. The goal is now to define `quickEncode` which encodes an equivalent representation, but more efficiently.
+
+```Scala
+def quickEncode(tree: CodeTree[T])(text: List[T]): List[Int] =
+  ???
+```
+
+Your implementation will build a coding table once which, for each possible symbol, gives the list of bits of its code. The simplest way - but not the most efficient - is to encode the table of symbols as a list of pairs.
+
+```Scala
+type CodeTable = List[(T, List[Int])]
+```
+
+The encoding must then be done by accessing the table, via a function `codeBits` which returns the bit sequence representing the given symbol in the code table:
+
+```Scala
+def codeBits(table: CodeTable)(symbol: T): List[Int] =
+  ???
+```
+
+The creation of the table is defined by `convert` which traverses the coding tree and constructs the character table, using the `mergeCodeTables` defined below:
+
+```Scala
+def convert(tree: CodeTree[T]): CodeTable =
+  ???
+```
+
+<details>
+<summary> Hint </summary> 
+
+Think of a recursive solution: Every subtree of the code tree tree is itself a valid code tree that can be represented as a code table. Using the code tables of the subtrees, think of how to build the code table for the entire tree (that’s why we need `mergeCodeTables`).
+
+</details><br/>
+
+```Scala
+def mergeCodeTables(a: CodeTable, b: CodeTable): CodeTable =
+  ???
+```
+
+Now we can implement `quickEncode` using `convert`.
 
 
 
