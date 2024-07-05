@@ -2,7 +2,7 @@
 
 This week's exercise will revisit some concepts that were introduced early in the course, or teased and then not followed up upon. You will also implement Huffman codes.
 
-The most important parts of the exercise are marked with ⭐️. Exercises that are particularly challenging are marked with 🔥.
+The most important parts of the exercise are marked with ⭐️. Exercises that are particularly challenging are marked with 🔥. Make sure to reach the last task, as it is marked with both. ⭐️🔥
 
 **You are allowed to copy/clone/fork this repository, but not to share solutions of the exercise in any public repository or web page.**
 
@@ -603,7 +603,7 @@ def mergeCodeTables(a: CodeTable, b: CodeTable): CodeTable =
 
 Now we can implement `quickEncode` using `convert`.
 
-## Burrows-Wheeler transform 🔥
+## Burrows-Wheeler transform ⭐️🔥
 
 The [Burrows-Wheeler transform](https://en.wikipedia.org/wiki/Burrows%E2%80%93Wheeler_transform) is a supportive method for text compression. 
 
