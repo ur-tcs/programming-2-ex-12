@@ -271,7 +271,7 @@ In general, any data that can be broken down into discrete, countable units can 
 
 ## Implementation
 
-This week, you will implement your project mostly from scratch. In the first section of this exercise, you have created a new project that already came with some basic infrastructure, such as a build.sbt file and a reasonable folder structure. We will now build on this.
+This week, you will implement your project mostly from scratch. In the first section of this exercise, you have created a new project that already came with some basic infrastructure, such as a build.sbt file and a reasonable folder structure. We will now build on this. This section heavily revisits the contents of the second lecture. If you get stuck, we recommend having a look at the lecture slides!
 
 At first, we will only focus on the theory of Huffman coding that you have just been introduced to: 
 
@@ -291,8 +291,6 @@ Come up with an `abstract class` `CodeTree[T]` that represents Huffman trees in 
 * Each leaf is associated with a symbol, while branching nodes are associated with sets or lists of symbols.
 * We use a type parameter `[T]` so our definition is not limited to one type.
 
-You also need to decide *where* to put the definition. Of course you could put everything into the `main.scala` file, or you could create one or more separate folders to structure your work. We leave this to you. 
-
 <details>
 <summary> Solution </summary> 
 
@@ -304,17 +302,39 @@ case class Fork[T](left: CodeTree[T], right: CodeTree[T], symbols: List[T], weig
 
 </details><br/>
 
-Time to define some useful functions! First, you are going to define the functions `weight`, which returns the weight of a Huffman tree's root node, and `symbols`, which returns a list of the symbols defined in a given Huffman tree.
+You also need to decide *where* to put the definition. Of course you could put everything into the `main.scala` file, but that is messy and poor programming practice. Therefore, we recommend you create one or more separate folders to structure your work. We leave this to you. 
 
-```Scala
-def weight(tree: CodeTree[T]): Int =
-  ???
+<details>
+<summary> Hint </summary> 
 
-def symbols(tree: CodeTree[T]): List[T] =
-  ???
+One of the easiest ways to manage multiple folders, and a method that has been employed in most exercises throughout this semester, is to put the contents of every folder into the same `package`. Your folder structure could look like this:
+
+```.
+├── src
+│   ├── main
+│   │   └── main.scala
+│   │   └── HuffImpl.scala
+│   └── test
+│       └── MySuite.scala
 ```
 
-Again, you decide where to put these functions. 
+Put the command `package huffman` at the top of both `main.scala` and `HuffImpl.scala`, where `huffman` is the name you can give your package.
+
+</details><br/>
+
+Time to define some useful functions! Before you can start implementing, you should think about class hierarchy. We want the following functions to work on every data type, as indicated by `[T]`. Therefore, all following functions should be members of a trait `HuffmanImpl[T]`.
+
+First, you are going to define the functions `weight`, which returns the weight of a Huffman tree's root node, and `symbols`, which returns a list of the symbols defined in a given Huffman tree.
+
+```Scala
+trait HuffmanImpl[T]:
+
+  def weight(tree: CodeTree[T]): Int =
+    ???
+
+  def symbols(tree: CodeTree[T]): List[T] =
+    ???
+```
 
 Using `weight` and `symbols`, you can define the function `makeCodeTree` which takes the left and right subtrees, then builds a new tree by adding a parent node on top of these two trees:
 
@@ -322,6 +342,8 @@ Using `weight` and `symbols`, you can define the function `makeCodeTree` which t
 def makeCodeTree(left: CodeTree[T], right: CodeTree[T]): CodeTree[T] =
   ???
 ```
+
+Remember that `makeCodeTree` should be a member of `HuffmanImpl[T]`, so we recommend putting the code right after the definition of `symbols` using the same indentation.
 
 <details>
 <summary> Solution </summary> 
@@ -333,14 +355,49 @@ def makeCodeTree(left: CodeTree[T], right: CodeTree[T]): CodeTree[T] =
 
 </details><br/>
 
+Now, how do you test your work? At this point, the data type `T` is not specified. If you want to make a tree where the symbols correspond to `Char`s, you need to define a new trait `HuffmanChar` that inherits from `Huffman[Char]`. Then, define `HuffmanChar`'s companion object. 
+
+```Scala
+trait HuffmanChar extends HuffmanImpl[Char]
+
+object HuffmanChar extends HuffmanChar
+```
+
+Now, you can apply your defined functions! 
+
 `makeCodeTree` automatically calculates the list of symbols and the weight when creating a node. Therefore, code trees can be constructed manually in the following way:
 
 ```Scala
+import HuffmanChar.*
+
 val sampleTree = makeCodeTree(
   makeCodeTree(Leaf('x', 1), Leaf('e', 1)),
   Leaf('t', 2)
 )
 ```
+
+Which brings us to...
+
+### Testing
+
+If you created your project following our instructions, a folder and file `MySuite.scala` have been automatically generated. The contents of `MySuite.scala` should look like this:
+
+```Scala
+// For more information on writing tests, see
+// https://scalameta.org/munit/docs/getting-started.html
+class MySuite extends munit.FunSuite {
+  test("example test that succeeds") {
+    val obtained = 42
+    val expected = 42
+    assertEquals(obtained, expected)
+  }
+}
+```
+
+You will now add tests on your own! We will start with `weight`.
+
+
+
 
 ### Constructing Huffman code trees
 
