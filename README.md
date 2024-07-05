@@ -1,10 +1,6 @@
 # Programming 2 - Exercise 12: Huffman Codes and Structuring Software Projects
 
-## "We'll get back to that later" is now
-
-In exercise 4, you were instructed to start a project from scratch. this time we'll once again start another project, but now also take the time to explain everything in detail.
-
-### Starting a simple project from scratch
+## Starting a simple project from scratch
 
 The following section explains every step needed for setting up a basic project. You can either use the Metals extention or the terminal. If you are using different IDEs, the second way will propably also work with the integrated terminals in these.
 
@@ -393,6 +389,8 @@ class MySuite extends munit.FunSuite {
   }
 }
 ```
+
+MUnit is a Scala testing library that is already included in your `build.sbt` file.
 
 You will now add tests on your own! We will start with `weight`.
 
