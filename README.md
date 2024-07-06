@@ -603,6 +603,84 @@ def mergeCodeTables(a: CodeTable, b: CodeTable): CodeTable =
 
 Now we can implement `quickEncode` using `convert`.
 
+### Decoding & Encoding into a file
+
+In prior tasks you already established many functions, but now it is time for you to try it yourself.
+
+The following code offers the functionality to Encode and Decode txt files.
+
+```scala
+ def bitsToBytes(bits: List[Int]): List[Byte] =
+    bits.grouped(8).toList.map { group =>
+      val byte = group.foldLeft(0) { (acc, bit) => (acc << 1) | bit }.toByte
+      if group.size < 8 then
+        (byte << (8 - group.size)).toByte
+      else byte
+    }
+
+  def encodeFile(filePath: String): Unit =
+    val path = Paths.get(filePath)
+    val filenameNoExt = path.getFileName.toString.split("\\.").head
+    val hufPath = Paths.get(path.getParent.toString, s"$filenameNoExt.huf")
+    val textBytes = Files.readAllBytes(path)
+    val text = new String(textBytes).toList
+    val codeTree = HuffmanChar.createCodeTree(text)
+    val n = serialize(codeTree, hufPath)
+    val encodedBits = HuffmanChar.quickEncode(codeTree)(text)
+    val encodedBytes = bitsToBytes(encodedBits)
+    Files.write(hufPath, intToByteArray(encodedBits.size), APPEND)
+    Files.write(hufPath, intToByteArray(encodedBytes.size), APPEND)
+    Files.write(hufPath, encodedBytes.toArray, APPEND)
+    val compressRatio = textBytes.size.toDouble / (12 + n + encodedBytes.size)
+    println(s"Compression Finished.")
+    println(s"Compression Ratio (Original Size / Compressed Size): ${(compressRatio * 100).round / 100.toDouble}")
+
+  def decodeFile(filePath: String): Unit =
+    def getCodeTree(buffer: ByteBuffer): CodeTree[Char] =
+      val n = buffer.getInt()
+      val bytes = new Array[Byte](n)
+      buffer.get(bytes)
+      deserialize(bytes)
+    val path = Paths.get(filePath)
+    val filenameNoExt = path.getFileName.toString.split("\\.").head
+    val buffer = ByteBuffer.wrap(Files.readAllBytes(path))
+    val codeTree = getCodeTree(buffer)
+    val nBit = buffer.getInt()
+    val nByte = buffer.getInt()
+    val encodedBytes = new Array[Byte](nByte)
+    buffer.get(encodedBytes)
+    val encodedBits: List[Bit] =
+      encodedBytes.flatMap { byte => (7 to 0 by -1).map { i => (byte >> i) & 1 } }.toList.take(nBit)
+    val decodedBytes = HuffmanChar.decode(codeTree, encodedBits).mkString.getBytes
+    Files.write(Paths.get(path.getParent.toString, s"$filenameNoExt-decoded.txt"), decodedBytes.toArray)
+```
+
+Put this code into your Main.scala or anywhere you deem appropriate.
+
+For this to be more orderly, create a new folder `assets`, as a place to store all files needed for and created from Encoding and Decoding. For example, place a new file called `test.txt` there, and write in some text you want to test, for example "Hello, functional programming is fun!" and compress it using `encodeFile()`. The generated code tree and encoded bit sequences are stored in a `.huf` file, in our example `test.huf`.
+
+You’ll find the outputed “Compression Ratio” (`original text size` divided by `compressed size`) is very small. It’s because `test.txt` is very small, and the code tree and encoded text is relatively large.
+
+Use `decodeFile()` to again decode the compressed `test.huf` files. A file `test-decoded.txt` will be generated, storing the decoded text. Compare `test.txt` and `test-decoded.txt` to see if they’re identical.
+
+To decode test.huf, use run decode ./assets/test.huf. A file test-decoded.txt will be generated, storing the decoded text. Compare test.txt and test-decoded.txt to see if they’re identical.
+
+### Bonus: Overflow error
+
+You might have stack overflow error when trying to pass very big files. 
+
+If you’ve encountered this issue, do you know why the `decode` function leads to stack overflow?
+
+<details>
+<summary> Hint </summary> 
+
+The reason is likely that your `decode` function is not tail recursive.
+
+In a standard recursive function, each recursive call adds a new layer to the call stack. If the recursion is deep, this can quickly consume all the available stack space, leading to a stack overflow.
+
+Tail recursion, on the other hand, is a form of recursion where the recursive call is the last operation in the function, allowing the Scala compiler to optimize it and use a constant amount of stack space.
+</details><br/>
+
 ## Burrows-Wheeler transform ⭐️🔥
 
 The [Burrows-Wheeler transform](https://en.wikipedia.org/wiki/Burrows%E2%80%93Wheeler_transform) is a supportive method for text compression. 
