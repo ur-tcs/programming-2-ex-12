@@ -73,7 +73,7 @@ Generated files (compiled classes, packaged jars, managed files, caches, and doc
 val scala3Version = "3.4.2"
 ```
 
-As part of your build definition you specify the version of sbt that your build uses. This allows people with different versions of the sbt launcher to build the same projects with consistent results.
+As part of your build definition, you specify the Scala version to be used in your build. sbt will take care of downloading and installing this version of the compiler. This allows people with different system configurations to build the same projects with consistent results.
 
 ```scala
 lazy val root = project
