@@ -1,6 +1,6 @@
 # Programming 2 - Exercise 12: Huffman Codes and Structuring Software Projects
 
-This week's exercise will revisit some concepts that were introduced early in the course, or teased and then not followed up upon. You will also implement Huffman codes.
+This week's exercise will revisit many concepts that were introduced earlier in the course. The main goal of the project is to implement **Huffman codes.**
 
 The most important parts of the exercise are marked with ⭐️. Exercises that are particularly challenging are marked with 🔥. Make sure to reach the last task, as it is marked with both. ⭐️🔥
 
