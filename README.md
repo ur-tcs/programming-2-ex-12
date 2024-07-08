@@ -603,14 +603,21 @@ def mergeCodeTables(a: CodeTable, b: CodeTable): CodeTable =
 
 Now we can implement `quickEncode` using `convert`.
 
-### Decoding & Encoding into a file
+### Bonus: Decoding & Encoding into a file
 
-In prior tasks you already established many functions, but now it is time for you to try it yourself.
+In prior tasks you already established many functions, but now it is time for you to try it yourself. This task is still a bit above your knowledge level, so you do not need to understand all provided code, this task is merely for you to explore further possibilities if you want to.
 
 The following code offers the functionality to Encode and Decode txt files.
 
 ```scala
- def bitsToBytes(bits: List[Int]): List[Byte] =
+package huffman
+
+import huffman.SerializationUtils.{serialize, deserialize, intToByteArray}
+import java.nio.file.{Files, Path, Paths}
+import java.nio.file.StandardOpenOption.APPEND
+import java.nio.ByteBuffer
+
+def bitsToBytes(bits: List[Int]): List[Byte] =
     bits.grouped(8).toList.map { group =>
       val byte = group.foldLeft(0) { (acc, bit) => (acc << 1) | bit }.toByte
       if group.size < 8 then
@@ -618,52 +625,113 @@ The following code offers the functionality to Encode and Decode txt files.
       else byte
     }
 
-  def encodeFile(filePath: String): Unit =
-    val path = Paths.get(filePath)
-    val filenameNoExt = path.getFileName.toString.split("\\.").head
-    val hufPath = Paths.get(path.getParent.toString, s"$filenameNoExt.huf")
-    val textBytes = Files.readAllBytes(path)
-    val text = new String(textBytes).toList
-    val codeTree = HuffmanChar.createCodeTree(text)
-    val n = serialize(codeTree, hufPath)
-    val encodedBits = HuffmanChar.quickEncode(codeTree)(text)
-    val encodedBytes = bitsToBytes(encodedBits)
-    Files.write(hufPath, intToByteArray(encodedBits.size), APPEND)
-    Files.write(hufPath, intToByteArray(encodedBytes.size), APPEND)
-    Files.write(hufPath, encodedBytes.toArray, APPEND)
-    val compressRatio = textBytes.size.toDouble / (12 + n + encodedBytes.size)
-    println(s"Compression Finished.")
-    println(s"Compression Ratio (Original Size / Compressed Size): ${(compressRatio * 100).round / 100.toDouble}")
+def encodeFile(filePath: String): Unit =
+  val path = Paths.get(filePath)
+  val filenameNoExt = path.getFileName.toString.split("\\.").head
+  val hufPath = Paths.get(path.getParent.toString, s"$filenameNoExt.huf")
+  val textBytes = Files.readAllBytes(path)
+  val text = new String(textBytes).toList
+  val codeTree = HuffmanChar.createCodeTree(text)
+  val n = serialize(codeTree, hufPath)
+  val encodedBits = HuffmanChar.quickEncode(codeTree)(text)
+  val encodedBytes = bitsToBytes(encodedBits)
+  Files.write(hufPath, intToByteArray(encodedBits.size), APPEND)
+  Files.write(hufPath, intToByteArray(encodedBytes.size), APPEND)
+  Files.write(hufPath, encodedBytes.toArray, APPEND)
+  val compressRatio = textBytes.size.toDouble / (12 + n + encodedBytes.size)
+  println(s"Compression Finished.")
+  println(s"Compression Ratio (Original Size / Compressed Size): ${(compressRatio * 100).round / 100.toDouble}")
 
-  def decodeFile(filePath: String): Unit =
-    def getCodeTree(buffer: ByteBuffer): CodeTree[Char] =
-      val n = buffer.getInt()
-      val bytes = new Array[Byte](n)
-      buffer.get(bytes)
-      deserialize(bytes)
-    val path = Paths.get(filePath)
-    val filenameNoExt = path.getFileName.toString.split("\\.").head
-    val buffer = ByteBuffer.wrap(Files.readAllBytes(path))
-    val codeTree = getCodeTree(buffer)
-    val nBit = buffer.getInt()
-    val nByte = buffer.getInt()
-    val encodedBytes = new Array[Byte](nByte)
-    buffer.get(encodedBytes)
-    val encodedBits: List[Bit] =
-      encodedBytes.flatMap { byte => (7 to 0 by -1).map { i => (byte >> i) & 1 } }.toList.take(nBit)
-    val decodedBytes = HuffmanChar.decode(codeTree, encodedBits).mkString.getBytes
-    Files.write(Paths.get(path.getParent.toString, s"$filenameNoExt-decoded.txt"), decodedBytes.toArray)
+def decodeFile(filePath: String): Unit =
+  def getCodeTree(buffer: ByteBuffer): CodeTree[Char] =
+    val n = buffer.getInt()
+    val bytes = new Array[Byte](n)
+    buffer.get(bytes)
+    deserialize(bytes)
+  val path = Paths.get(filePath)
+  val filenameNoExt = path.getFileName.toString.split("\\.").head
+  val buffer = ByteBuffer.wrap(Files.readAllBytes(path))
+  val codeTree = getCodeTree(buffer)
+  val nBit = buffer.getInt()
+  val nByte = buffer.getInt()
+  val encodedBytes = new Array[Byte](nByte)
+  buffer.get(encodedBytes)
+  val encodedBits: List[Int] =
+    encodedBytes.flatMap { byte => (7 to 0 by -1).map { i => (byte >> i) & 1 } }.toList.take(nBit)
+  val decodedBytes = HuffmanChar.decode(codeTree, encodedBits).mkString.getBytes
+  Files.write(Paths.get(path.getParent.toString, s"$filenameNoExt-decoded.txt"), decodedBytes.toArray)
+```
+Put above code into your `Main.scala`.
+
+And put the code below into a new file `SerializationUtils.scala` in your `main` folder
+
+```scala
+package huffman
+
+import huffman.{CodeTree, Leaf, Fork}
+import upickle.default.*
+import java.nio.file.{Files, Path, Paths}
+import java.nio.file.StandardOpenOption.APPEND
+
+object SerializationUtils:
+
+  sealed trait SerialCodeTree derives ReadWriter
+  case class SerialLeaf(char: Char, weight: Int) extends SerialCodeTree
+  case class SerialFork(left: SerialCodeTree, right: SerialCodeTree, chars: List[Char], weight: Int)
+      extends SerialCodeTree
+
+  def intToByteArray(v: Int): Array[Byte] = Array(
+    (v >>> 24).toByte,
+    (v >>> 16).toByte,
+    (v >>> 8).toByte,
+    v.toByte
+  )
+
+  def convertToSerial(tree: CodeTree[Char]): SerialCodeTree = tree match
+    case Leaf(c, w)               => SerialLeaf(c, w)
+    case Fork(left, right, cs, w) => SerialFork(convertToSerial(left), convertToSerial(right), cs, w)
+
+  def convertFromSerial(tree: SerialCodeTree): CodeTree[Char] = tree match
+    case SerialLeaf(c, w)               => Leaf(c, w)
+    case SerialFork(left, right, cs, w) => Fork(convertFromSerial(left), convertFromSerial(right), cs, w)
+
+  def serialize(tree: CodeTree[Char], path: Path): Int =
+    val json = write(convertToSerial(tree)).getBytes
+    Files.write(path, intToByteArray(json.size))
+    Files.write(path, json, APPEND)
+    json.size
+
+  def deserialize(bytes: Array[Byte]): CodeTree[Char] =
+    val json = new String(bytes)
+    convertFromSerial(read[SerialCodeTree](json))
+
 ```
 
-Put this code into your Main.scala or anywhere you deem appropriate.
+You also have to edit the `build.sbt` file to include a specific library dependency. therefore just add `libraryDependencies += "com.lihaoyi" %% "upickle" % "3.1.2"` into the file, so it looks like this:
+
+```scala
+val scala3Version = "3.4.2"
+
+lazy val root = project
+  .in(file("."))
+  .settings(
+    name := "huffman",
+    version := "0.1.0-SNAPSHOT",
+
+    scalaVersion := scala3Version,
+
+    libraryDependencies += "com.lihaoyi" %% "upickle" % "3.1.2",
+    libraryDependencies += "org.scalameta" %% "munit" % "1.0.0" % Test
+  )
+```
+
+After changing the `build.sbt` file, in case you had `sbt` still running from previous tasks, make sure that you restart `sbt` to apply the changes.
 
 For this to be more orderly, create a new folder `assets`, as a place to store all files needed for and created from Encoding and Decoding. For example, place a new file called `test.txt` there, and write in some text you want to test, for example "Hello, functional programming is fun!" and compress it using `encodeFile()`. The generated code tree and encoded bit sequences are stored in a `.huf` file, in our example `test.huf`.
 
 You’ll find the outputed “Compression Ratio” (`original text size` divided by `compressed size`) is very small. It’s because `test.txt` is very small, and the code tree and encoded text is relatively large.
 
 Use `decodeFile()` to again decode the compressed `test.huf` files. A file `test-decoded.txt` will be generated, storing the decoded text. Compare `test.txt` and `test-decoded.txt` to see if they’re identical.
-
-To decode test.huf, use run decode ./assets/test.huf. A file test-decoded.txt will be generated, storing the decoded text. Compare test.txt and test-decoded.txt to see if they’re identical.
 
 ### Bonus: Overflow error
 
