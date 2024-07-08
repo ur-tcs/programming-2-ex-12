@@ -96,7 +96,7 @@ build.sbt conceals how sbt really works. sbt builds are defined with Scala code.
 
 The project directory is another build inside your build, which knows how to build your build. Your build definition is an sbt project.
 
-This topic is rather complex but you can read about what it is and how to use it in the [sbt doumentation](https://www.scala-sbt.org/1.x/docs/Organizing-Build.html)
+This topic is rather complex but you can read about what it is and how to use it in the [sbt documentation](https://www.scala-sbt.org/1.x/docs/Organizing-Build.html)
 
 #### README.md
 
