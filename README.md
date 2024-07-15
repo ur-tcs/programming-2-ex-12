@@ -472,6 +472,13 @@ def symbolFreqs(symbols: List[T]): List[(T, Int)] =
   ???
 ```
 
+<details>
+<summary> Hint </summary> 
+
+Look into the `groupBy` method for lists.
+
+</details><br/>
+
 2. Write a function `makeOrderedLeafList` which generates a list containing all the leaves of the Huffman code tree to be constructed (the case `Leaf[T]` of the algebraic datatype `CodeTree[T]`). The list should be ordered by ascending weights where the weight of a leaf is the number of times (i.e., the frequency) it appears in the given text.
 
 ```Scala
